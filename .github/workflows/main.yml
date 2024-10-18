@@ -1,0 +1,24 @@
+name: RobotQA Java CI with Maven
+
+on: push
+
+jobs:
+  run_robotqa:
+    name: RobotQA automation
+    runs-on: ubuntu-latest
+    env:
+      TOKEN: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZXN0c3VpdGUiOiJib3VuIiwiaWF0IjoxNzI5MjM0MjUzOTA5LCJleHAiOjE3MjkyMzQyODk5MDl9.eyTHHkzjQegpbVDv_kv-no8uWd6yDinf1Eog7uGBLC4'
+      PROJECT_NAME: 'Mobile Web Test'
+      DEVICE_IDS: >
+        [{"name":"Xiaomi Redmi Note 9 Pro","udid":"75c53f4a", "runTest": true},
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'RobotQA Run'
+        run: |
+          mvn package -DskipTests=true -q
+          wget file.robotqa.com/get_file_by_path?path=general-files/robotqa-github-ci-appium-web-testng.tar.gz -O robotqa-github-ci-appium-web-testng.tar.gz
+          unzip robotqa-github-ci-appium-web-testng.tar.gz
+          cd output
+          npm install
+          DIR=$GITHUB_WORKSPACE TOKEN=$TOKEN DEVICE_ID=$DEVICE_IDS APP_NAME=$PROJECT_NAME TEST_NAME=$GITHUB_REPOSITORY TEST_DESC=$GITHUB_ACTION node index.js
